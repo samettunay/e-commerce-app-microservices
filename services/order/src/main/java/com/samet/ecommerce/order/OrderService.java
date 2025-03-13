@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.samet.ecommerce.customer.CustomerClient;
 import com.samet.ecommerce.exception.BusinessException;
+import com.samet.ecommerce.kafka.OrderConfirmation;
+import com.samet.ecommerce.kafka.OrderProducer;
 import com.samet.ecommerce.orderline.OrderLineRequest;
 import com.samet.ecommerce.orderline.OrderLineService;
 import com.samet.ecommerce.product.ProductClient;
@@ -22,13 +24,14 @@ public class OrderService {
     private final ProductClient productClient;
     private final OrderRepository repository;
     private final OrderLineService orderLineService;
+    private final OrderProducer orderProducer;
     private final OrderMapper mapper;
 
     public Integer createOrder(OrderRequest request) {
         var customer = this.customerClient.findCustomerById(request.customerId())
                 .orElseThrow(() -> new BusinessException(String.format("Cannot create order:: No Customer exists with the provided ID: %s", request.customerId())));
         
-        this.productClient.purchaseProducts(request.products());
+        var purchasedProducts = this.productClient.purchaseProducts(request.products());
 
         var order = this.repository.save(mapper.toOrder(request));
 
@@ -45,9 +48,17 @@ public class OrderService {
 
         // TODO start payment process
 
-        // TODO send notification
+        orderProducer.sendOrderConfirmation(
+            new OrderConfirmation(
+                request.reference(),
+                request.amount(),
+                request.paymentMethod(),
+                customer,
+                purchasedProducts
+            )
+        );
         
-        return null;
+        return order.getId();
     }
 
     public List<OrderResponse> findAllOrders() {

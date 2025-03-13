@@ -10,6 +10,8 @@ import com.samet.ecommerce.kafka.OrderConfirmation;
 import com.samet.ecommerce.kafka.OrderProducer;
 import com.samet.ecommerce.orderline.OrderLineRequest;
 import com.samet.ecommerce.orderline.OrderLineService;
+import com.samet.ecommerce.payment.PaymentClient;
+import com.samet.ecommerce.payment.PaymentRequest;
 import com.samet.ecommerce.product.ProductClient;
 import com.samet.ecommerce.product.PurchaseRequest;
 
@@ -25,6 +27,7 @@ public class OrderService {
     private final OrderRepository repository;
     private final OrderLineService orderLineService;
     private final OrderProducer orderProducer;
+    private final PaymentClient paymentClient;
     private final OrderMapper mapper;
 
     public Integer createOrder(OrderRequest request) {
@@ -46,7 +49,15 @@ public class OrderService {
             );
         }
 
-        // TODO start payment process
+        paymentClient.requestOrderPayment(
+            new PaymentRequest(
+                request.amount(),
+                request.paymentMethod(),
+                order.getId(),
+                order.getReference(),
+                customer
+            )
+        );
 
         orderProducer.sendOrderConfirmation(
             new OrderConfirmation(

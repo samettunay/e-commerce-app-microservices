@@ -1,16 +1,15 @@
 package com.samet.ecommerce.orderline;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class OrderLineService {
-    
+
     private final OrderLineRepository repository;
     private final OrderLineMapper mapper;
 
@@ -24,6 +23,5 @@ public class OrderLineService {
                 .stream()
                 .map(mapper::toOrderLineResponse)
                 .collect(Collectors.toList());
-    }  
-    
+    }
 }

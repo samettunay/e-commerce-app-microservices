@@ -1,15 +1,6 @@
 package com.samet.ecommerce.order;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import com.samet.ecommerce.orderline.OrderLine;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -19,43 +10,43 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @AllArgsConstructor
-@NoArgsConstructor
+@Builder
 @Getter
 @Setter
-@Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
 @Table(name = "customer_order")
 public class Order {
-    @Id
-    @GeneratedValue
-    private Integer id;
 
-    private String reference;
+  @Id
+  @GeneratedValue
+  private Integer id;
 
-    private BigDecimal totalAmount;
+  @Column(unique = true,  nullable = false)
+  private String reference;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
+  private BigDecimal totalAmount;
 
-    private String customerId;
+  @Enumerated(EnumType.STRING)
+  private PaymentMethod paymentMethod;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderLine> orderLines;
+  private String customerId;
 
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime lastModifiedAt;
-
+  @OneToMany(mappedBy = "order")
+  private List<OrderLine> orderLines;
 }

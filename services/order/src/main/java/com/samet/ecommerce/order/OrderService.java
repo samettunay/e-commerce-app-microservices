@@ -1,12 +1,8 @@
 package com.samet.ecommerce.order;
 
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
+import com.samet.ecommerce.kafka.OrderConfirmation;
 import com.samet.ecommerce.customer.CustomerClient;
 import com.samet.ecommerce.exception.BusinessException;
-import com.samet.ecommerce.kafka.OrderConfirmation;
 import com.samet.ecommerce.kafka.OrderProducer;
 import com.samet.ecommerce.orderline.OrderLineRequest;
 import com.samet.ecommerce.orderline.OrderLineService;
@@ -14,6 +10,10 @@ import com.samet.ecommerce.payment.PaymentClient;
 import com.samet.ecommerce.payment.PaymentRequest;
 import com.samet.ecommerce.product.ProductClient;
 import com.samet.ecommerce.product.PurchaseRequest;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,53 +22,52 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final CustomerClient customerClient;
-    private final ProductClient productClient;
     private final OrderRepository repository;
+    private final OrderMapper mapper;
+    private final CustomerClient customerClient;
+    private final PaymentClient paymentClient;
+    private final ProductClient productClient;
     private final OrderLineService orderLineService;
     private final OrderProducer orderProducer;
-    private final PaymentClient paymentClient;
-    private final OrderMapper mapper;
 
+    @Transactional
     public Integer createOrder(OrderRequest request) {
         var customer = this.customerClient.findCustomerById(request.customerId())
-                .orElseThrow(() -> new BusinessException(String.format("Cannot create order:: No Customer exists with the provided ID: %s", request.customerId())));
-        
-        var purchasedProducts = this.productClient.purchaseProducts(request.products());
+                .orElseThrow(() -> new BusinessException("Cannot create order:: No customer exists with the provided ID"));
+
+        var purchasedProducts = productClient.purchaseProducts(request.products());
 
         var order = this.repository.save(mapper.toOrder(request));
 
-        for(PurchaseRequest purchaseRequest : request.products()){
+        for (PurchaseRequest purchaseRequest : request.products()) {
             orderLineService.saveOrderLine(
-                new OrderLineRequest(
-                   null,
-                   order.getId(),
-                   purchaseRequest.productId(),
-                   purchaseRequest.quantity()
-                )
+                    new OrderLineRequest(
+                            null,
+                            order.getId(),
+                            purchaseRequest.productId(),
+                            purchaseRequest.quantity()
+                    )
             );
         }
-
-        paymentClient.requestOrderPayment(
-            new PaymentRequest(
+        var paymentRequest = new PaymentRequest(
                 request.amount(),
                 request.paymentMethod(),
                 order.getId(),
                 order.getReference(),
                 customer
-            )
         );
+        paymentClient.requestOrderPayment(paymentRequest);
 
         orderProducer.sendOrderConfirmation(
-            new OrderConfirmation(
-                request.reference(),
-                request.amount(),
-                request.paymentMethod(),
-                customer,
-                purchasedProducts
-            )
+                new OrderConfirmation(
+                        request.reference(),
+                        request.amount(),
+                        request.paymentMethod(),
+                        customer,
+                        purchasedProducts
+                )
         );
-        
+
         return order.getId();
     }
 

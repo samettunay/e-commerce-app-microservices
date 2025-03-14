@@ -1,9 +1,9 @@
 package com.samet.ecommerce.payment;
 
-import java.math.BigDecimal;
-
 import com.samet.ecommerce.customer.CustomerResponse;
 import com.samet.ecommerce.order.PaymentMethod;
+
+import java.math.BigDecimal;
 
 public record PaymentRequest(
     BigDecimal amount,
@@ -12,5 +12,4 @@ public record PaymentRequest(
     String orderReference,
     CustomerResponse customer
 ) {
-
 }

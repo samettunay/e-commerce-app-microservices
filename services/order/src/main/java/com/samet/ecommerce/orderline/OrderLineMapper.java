@@ -1,8 +1,7 @@
 package com.samet.ecommerce.orderline;
 
-import org.springframework.stereotype.Service;
-
 import com.samet.ecommerce.order.Order;
+import org.springframework.stereotype.Service;
 
 @Service
 public class OrderLineMapper {

@@ -1,5 +1,9 @@
 # Microservices Course - Spring Boot
 
+Kurs: https://www.youtube.com/watch?v=jdeSV0GRvwI&t
+
+![diagram](https://github.com/user-attachments/assets/b9aa5d87-e56e-4d47-ab12-930d4449fce5)
+
 Bu proje, **Mikroservis Mimarisi**'ni Spring Boot ile derinlemesine öğrenmek için hazırlanmış bir eğitim içeriğidir.
 
 ## 🚀 Projede Kullanılan Temel Kavramlar
@@ -52,9 +56,3 @@ Proje, Docker Compose kullanılarak container ortamında çalıştırılmaktadı
 - API Gateway
 - Docker
 - Keyclaok & Zipkin
-
-
-![diagram](https://github.com/user-attachments/assets/b9aa5d87-e56e-4d47-ab12-930d4449fce5)
-
-Course: https://www.youtube.com/watch?v=jdeSV0GRvwI&t
-

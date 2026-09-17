@@ -1,58 +1,147 @@
-# Microservices Course - Spring Boot
+# E-Commerce Microservices
 
-Kurs: https://www.youtube.com/watch?v=jdeSV0GRvwI&t
+A backend-focused e-commerce application built with **Java & Spring Boot**, designed around **Microservices Architecture**, event-driven communication and distributed system patterns.
 
-![diagram](https://github.com/user-attachments/assets/b9aa5d87-e56e-4d47-ab12-930d4449fce5)
+The project focuses on building independently deployable services, asynchronous communication with Kafka, service discovery, API routing and resilience patterns commonly used in modern backend systems.
 
-Bu proje, **Mikroservis Mimarisi**'ni Spring Boot ile derinlemesine öğrenmek için hazırlanmış bir eğitim içeriğidir.
+## Tech Stack
 
-## 🚀 Projede Kullanılan Temel Kavramlar
-- **Service Registry and Discovery (Eureka)**: Mikroservislerin birbirini bulmasını sağlar.
-- **API Gateway**: Tüm isteklerin geçtiği bir kapı, güvenlik ve yönlendirme sağlar.
-- **CQRS (Command Query Responsibility Segregation)**: Okuma ve yazma işlemlerinin ayrılması.
-- **Her Servise Ayrı Veritabanı (Database per Service)**: Mikroservisler için bağımsız veritabanı.
-- **Event-Driven Architecture (Kafka)**: Mikroservisler arası mesajlaşma.
-- **Saga Pattern**: Dağıtık işlemlerin yönetimi.
-- **Circuit Breaker**: Hatalı servislerin diğerlerini etkilemesini engelleyen mekanizma.
+![Java](https://img.shields.io/badge/Java-ED8B00?style=flat&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=spring-boot&logoColor=white)
+![Spring Cloud](https://img.shields.io/badge/Spring_Cloud-6DB33F?style=flat&logo=spring&logoColor=white)
+![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=flat&logo=apache-kafka&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
 
-## 🛠️ Proje İçeriği
+## Architecture
 
-### Bölüm 1: Spring Boot Temelleri
-- Spring Framework teorik giriş
-- Proje oluşturma
-- Veritabanı bağlantısı (Hibernate, JPA)
-- Servis, Controller, DTO, Exception Handling
+The application follows a distributed microservices architecture where services are separated by business responsibility.
 
-### Bölüm 2: Mikroservis Mimarisi Tanıtımı
-- Mikroservis nedir?
-- Mikroservis mimarisinin temel prensipleri
-- Mikroservis mimarisi desenleri
+```mermaid
+flowchart TD
+    Client[Client / API Consumer]
 
-### Bölüm 3: Uygulama Geliştirme Adımları
-- GitHub Mono-Repository oluşturma
-- Müşteri, Sipariş, Ödeme, Bildirim servislerinin geliştirilmesi
-- Config Server ile merkezi yapılandırma yönetimi
-- Eureka Service Discovery entegrasyonu
-- API Gateway ile istek yönlendirme
-- Kafka ile asenkron iletişim
-- E-posta bildirim servisi
-- Dağıtık izleme (Zipkin)
-- API Gateway üzerinden dökümantasyon sağlama
+    Gateway[API Gateway]
+    Discovery[Eureka Service Discovery]
 
-## 📂 Mikroservisler
-- **Customer Service**
-- **Order Service**
-- **Payment Service**
-- **Notification Service**
+    ServiceA[Domain Service]
+    ServiceB[Domain Service]
+    ServiceC[Domain Service]
 
-## 🐳 Docker Kullanımı
-Proje, Docker Compose kullanılarak container ortamında çalıştırılmaktadır.
+    Kafka[Apache Kafka]
 
+    DB1[(Database)]
+    DB2[(Database)]
+    DB3[(Database)]
 
-## 🔗 Teknolojiler
-- Java Spring Boot
-- Kafka
-- Eureka
-- API Gateway
-- Docker
-- Keyclaok & Zipkin
+    Client --> Gateway
+
+    Gateway --> ServiceA
+    Gateway --> ServiceB
+    Gateway --> ServiceC
+
+    Discovery -. Service Registration .-> Gateway
+    Discovery -. Service Registration .-> ServiceA
+    Discovery -. Service Registration .-> ServiceB
+    Discovery -. Service Registration .-> ServiceC
+
+    ServiceA <--> Kafka
+    ServiceB <--> Kafka
+    ServiceC <--> Kafka
+
+    ServiceA --> DB1
+    ServiceB --> DB2
+    ServiceC --> DB3
+```
+
+## Key Concepts
+
+- Microservices Architecture
+- RESTful API development
+- API Gateway pattern
+- Service Discovery with Eureka
+- Event-driven communication with Apache Kafka
+- CQRS pattern
+- Saga pattern for distributed workflows
+- Circuit Breaker / resilience patterns
+- Independent service responsibilities
+- Asynchronous service communication
+- Containerized development environment with Docker
+- Distributed system design
+
+## Backend Architecture
+
+### API Gateway
+
+Provides a single entry point for external clients and routes incoming requests to the appropriate microservices.
+
+### Service Discovery
+
+**Eureka** is used for dynamic service registration and discovery, allowing services to communicate without relying on hard-coded locations.
+
+### Event-Driven Communication
+
+**Apache Kafka** is used for asynchronous communication between services.
+
+This helps reduce direct dependencies between microservices and enables loosely coupled workflows.
+
+### CQRS
+
+Command and query responsibilities are separated where appropriate to keep business operations easier to maintain and scale.
+
+### Saga Pattern
+
+Distributed business operations are coordinated using the **Saga pattern**, avoiding traditional transactions across multiple independent services.
+
+### Circuit Breaker
+
+Resilience patterns are used to prevent failures in one service from propagating through the entire system.
+
+## Docker
+
+The services can be containerized and managed together using **Docker Compose**, providing a consistent local development environment.
+
+Example:
+
+```bash
+docker-compose up -d
+```
+
+To stop the environment:
+
+```bash
+docker-compose down
+```
+
+## What This Project Demonstrates
+
+This project was built to explore the architecture and engineering challenges involved in distributed backend systems, including:
+
+- Designing independently responsible services
+- Managing communication between services
+- Handling asynchronous events
+- Reducing coupling between backend components
+- Building resilient service-to-service communication
+- Applying distributed transaction patterns
+- Running multiple services in a containerized environment
+
+## Technologies
+
+| Area | Technologies |
+|---|---|
+| Language | Java |
+| Backend | Spring Boot |
+| Microservices | Spring Cloud |
+| API Routing | API Gateway |
+| Service Discovery | Eureka |
+| Messaging | Apache Kafka |
+| Architecture | Microservices, CQRS, Saga |
+| Resilience | Circuit Breaker |
+| Containerization | Docker, Docker Compose |
+| Communication | REST APIs, Event-Driven Messaging |
+
+---
+
+Developed by **Samet Tunay**
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Samet_Tunay-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/samet-tunay/)
+[![GitHub](https://img.shields.io/badge/GitHub-samettunay-181717?style=flat&logo=github&logoColor=white)](https://github.com/samettunay)
